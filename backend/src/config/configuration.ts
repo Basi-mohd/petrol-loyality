@@ -9,6 +9,7 @@ export default () => ({
     database: process.env.DB_NAME || 'petrol_loyalty',
   },
   redis: {
+    enabled: process.env.REDIS_HOST !== undefined && process.env.REDIS_HOST !== 'localhost',
     host: process.env.REDIS_HOST || 'localhost',
     port: parseInt(process.env.REDIS_PORT || '6379', 10),
     password: process.env.REDIS_PASSWORD,

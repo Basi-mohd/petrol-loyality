@@ -14,9 +14,17 @@ import { EmployeeOtpModule } from './modules/employee-otp/employee-otp.module';
 import { EmployeeModule } from './modules/employee/employee.module';
 import { CustomerModule } from './modules/customer/customer.module';
 import { CacheModuleRedis } from './infrastructure/persistence/redis/cache.module';
-import { BullMQModule } from './infrastructure/messaging/bullmq/bullmq.module';
 import { HealthController } from './presentation/controllers/health/health.controller';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+
+let BullMQModule: any = null;
+if (process.env.REDIS_HOST && process.env.REDIS_HOST !== 'localhost') {
+  try {
+    BullMQModule = require('./infrastructure/messaging/bullmq/bullmq.module').BullMQModule;
+  } catch (error) {
+    console.warn('BullMQ module not available, skipping...');
+  }
+}
 import { GlobalExceptionFilter } from './presentation/filters/global-exception.filter';
 import { DomainExceptionFilter } from './presentation/filters/domain-exception.filter';
 import { ValidationExceptionFilter } from './presentation/filters/validation-exception.filter';
@@ -38,7 +46,7 @@ import { ValidationPipe } from './presentation/pipes/validation.pipe';
       inject: [ConfigService],
     }),
     CacheModuleRedis,
-    BullMQModule,
+    ...(BullMQModule ? [BullMQModule] : []),
     TransactionsModule,
     LedgerModule,
     AuthModule,

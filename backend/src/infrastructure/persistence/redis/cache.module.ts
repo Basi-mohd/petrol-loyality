@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Logger } from '@nestjs/common';
 import { CacheModule } from '@nestjs/cache-manager';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { redisStore } from 'cache-manager-ioredis-yet';
@@ -10,14 +10,30 @@ import { getRedisConfig } from '../../../config/redis.config';
     CacheModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
-        const config = getRedisConfig(configService);
+        const redisEnabled = configService.get<boolean>('redis.enabled');
+        const logger = new Logger('CacheModule');
+        
+        if (redisEnabled) {
+          try {
+            const config = getRedisConfig(configService);
+            logger.log('Using Redis cache');
+            return {
+              store: await redisStore({
+                host: config.host,
+                port: config.port,
+                password: config.password,
+                ttl: config.ttl * 1000,
+              }),
+            };
+          } catch (error) {
+            logger.warn('Redis connection failed, falling back to in-memory cache', error.message);
+          }
+        } else {
+          logger.log('Redis not configured, using in-memory cache');
+        }
+        
         return {
-          store: await redisStore({
-            host: config.host,
-            port: config.port,
-            password: config.password,
-            ttl: config.ttl * 1000,
-          }),
+          ttl: configService.get<number>('redis.ttl') * 1000 || 3600000,
         };
       },
       inject: [ConfigService],
