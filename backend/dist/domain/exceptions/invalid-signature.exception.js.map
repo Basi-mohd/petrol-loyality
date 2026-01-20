@@ -1,0 +1,1 @@
+{"version":3,"file":"invalid-signature.exception.js","sourceRoot":"","sources":["../../../src/domain/exceptions/invalid-signature.exception.ts"],"names":[],"mappings":";;;AAAA,yDAAqD;AAErD,MAAa,yBAA0B,SAAQ,kCAAe;IAC5D,YAAY,UAAkB,+BAA+B;QAC3D,KAAK,CAAC,OAAO,EAAE,mBAAmB,EAAE,GAAG,CAAC,CAAC;QACzC,IAAI,CAAC,IAAI,GAAG,2BAA2B,CAAC;IAC1C,CAAC;CACF;AALD,8DAKC"}

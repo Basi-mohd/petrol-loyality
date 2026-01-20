@@ -1,0 +1,1 @@
+{"version":3,"file":"fraud-detected.event.js","sourceRoot":"","sources":["../../../../src/domain/interfaces/events/fraud-detected.event.ts"],"names":[],"mappings":";;;AAGA,MAAa,kBAAkB;IAC7B,YACkB,WAAwB,EACxB,SAAyB,EACzB,OAAiB;QAFjB,gBAAW,GAAX,WAAW,CAAa;QACxB,cAAS,GAAT,SAAS,CAAgB;QACzB,YAAO,GAAP,OAAO,CAAU;IAChC,CAAC;CACL;AAND,gDAMC"}
