@@ -22,14 +22,32 @@ exports.CacheModuleRedis = CacheModuleRedis = __decorate([
             cache_manager_1.CacheModule.registerAsync({
                 imports: [config_1.ConfigModule],
                 useFactory: async (configService) => {
-                    const config = (0, redis_config_1.getRedisConfig)(configService);
+                    const redisEnabled = configService.get('redis.enabled');
+                    const logger = new common_1.Logger('CacheModule');
+                    const ttlMs = (configService.get('redis.ttl') || 3600) * 1000;
+                    if (redisEnabled) {
+                        try {
+                            const config = (0, redis_config_1.getRedisConfig)(configService);
+                            logger.log('Using Redis cache');
+                            return {
+                                store: await (0, cache_manager_ioredis_yet_1.redisStore)({
+                                    host: config.host,
+                                    port: config.port,
+                                    password: config.password,
+                                    ttl: ttlMs,
+                                }),
+                                ttl: ttlMs,
+                            };
+                        }
+                        catch (error) {
+                            logger.warn(`Redis connection failed, falling back to in-memory cache: ${error instanceof Error ? error.message : String(error)}`);
+                        }
+                    }
+                    else {
+                        logger.log('Redis not configured, using in-memory cache');
+                    }
                     return {
-                        store: await (0, cache_manager_ioredis_yet_1.redisStore)({
-                            host: config.host,
-                            port: config.port,
-                            password: config.password,
-                            ttl: config.ttl * 1000,
-                        }),
+                        ttl: ttlMs,
                     };
                 },
                 inject: [config_1.ConfigService],

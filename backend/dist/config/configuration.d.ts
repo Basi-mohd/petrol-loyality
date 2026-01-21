@@ -9,6 +9,7 @@ declare const _default: () => {
         database: string;
     };
     redis: {
+        enabled: boolean;
         host: string;
         port: number;
         password: string;

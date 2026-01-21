@@ -26,9 +26,17 @@ const employee_otp_module_1 = require("./modules/employee-otp/employee-otp.modul
 const employee_module_1 = require("./modules/employee/employee.module");
 const customer_module_1 = require("./modules/customer/customer.module");
 const cache_module_1 = require("./infrastructure/persistence/redis/cache.module");
-const bullmq_module_1 = require("./infrastructure/messaging/bullmq/bullmq.module");
 const health_controller_1 = require("./presentation/controllers/health/health.controller");
 const core_1 = require("@nestjs/core");
+let BullMQModule = null;
+if (process.env.REDIS_HOST && process.env.REDIS_HOST !== 'localhost') {
+    try {
+        BullMQModule = require('./infrastructure/messaging/bullmq/bullmq.module').BullMQModule;
+    }
+    catch (error) {
+        console.warn('BullMQ module not available, skipping...');
+    }
+}
 const global_exception_filter_1 = require("./presentation/filters/global-exception.filter");
 const domain_exception_filter_1 = require("./presentation/filters/domain-exception.filter");
 const validation_exception_filter_1 = require("./presentation/filters/validation-exception.filter");
@@ -52,7 +60,7 @@ exports.AppModule = AppModule = __decorate([
                 inject: [config_1.ConfigService],
             }),
             cache_module_1.CacheModuleRedis,
-            bullmq_module_1.BullMQModule,
+            ...(BullMQModule ? [BullMQModule] : []),
             transactions_module_1.TransactionsModule,
             ledger_module_1.LedgerModule,
             auth_module_1.AuthModule,

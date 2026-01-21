@@ -18,4 +18,10 @@ export default new DataSource({
   synchronize: false,
   logging: process.env.NODE_ENV === 'development',
   migrationsRun: false,
+  ssl:
+    (process.env.NODE_ENV === 'production' ||
+      (process.env.DB_HOST && process.env.DB_HOST !== 'localhost')) &&
+    process.env.DB_SSL !== 'false'
+      ? { rejectUnauthorized: false }
+      : false,
 });
