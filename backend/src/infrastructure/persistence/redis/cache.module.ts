@@ -12,7 +12,8 @@ import { getRedisConfig } from '../../../config/redis.config';
       useFactory: async (configService: ConfigService) => {
         const redisEnabled = configService.get<boolean>('redis.enabled');
         const logger = new Logger('CacheModule');
-        
+        const ttlMs = (configService.get<number>('redis.ttl') || 3600) * 1000;
+
         if (redisEnabled) {
           try {
             const config = getRedisConfig(configService);
@@ -22,18 +23,21 @@ import { getRedisConfig } from '../../../config/redis.config';
                 host: config.host,
                 port: config.port,
                 password: config.password,
-                ttl: config.ttl * 1000,
+                ttl: ttlMs,
               }),
+              ttl: ttlMs,
             };
           } catch (error) {
-            logger.warn('Redis connection failed, falling back to in-memory cache', error.message);
+            logger.warn(
+              `Redis connection failed, falling back to in-memory cache: ${error instanceof Error ? error.message : String(error)}`,
+            );
           }
         } else {
           logger.log('Redis not configured, using in-memory cache');
         }
-        
+
         return {
-          ttl: configService.get<number>('redis.ttl') * 1000 || 3600000,
+          ttl: ttlMs,
         };
       },
       inject: [ConfigService],
